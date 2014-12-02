@@ -774,17 +774,22 @@ Files are returned as relative paths to the project root."
   :group 'projectile
   :type 'string)
 
+(defcustom projectile-get-ext-commands
+  '((git . projectile-git-command)
+    (hg . projectile-hg-command)
+    (fossil . projectile-fossil-command)
+    (bzr . projectile-bzr-command)
+    (darcs . projectile-darcs-command)
+    (svn . projectile-svn-command))
+  "Determine which external command to invoke based on the project's VCS."
+  :group 'projectile)
+
 (defun projectile-get-ext-command ()
   "Determine which external command to invoke based on the project's VCS."
-  (let ((vcs (projectile-project-vcs)))
-    (cond
-     ((eq vcs 'git) projectile-git-command)
-     ((eq vcs 'hg) projectile-hg-command)
-     ((eq vcs 'fossil) projectile-fossil-command)
-     ((eq vcs 'bzr) projectile-bzr-command)
-     ((eq vcs 'darcs) projectile-darcs-command)
-     ((eq vcs 'svn) projectile-svn-command)
-     (t projectile-generic-command))))
+  (let* ((vcs (projectile-project-vcs))
+         (ext-command (cdr (assoc vcs projectile-get-ext-commands))))
+    (or ext-command
+        projectile-generic-command)))
 
 (defun projectile-get-sub-projects-command ()
   (let ((vcs (projectile-project-vcs)))
